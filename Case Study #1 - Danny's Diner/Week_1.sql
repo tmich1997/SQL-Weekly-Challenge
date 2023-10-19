@@ -145,3 +145,4 @@ GROUP by customer_id;
 -- how many points do customer A and B have at the end of January?
 
 
+-- hello 
