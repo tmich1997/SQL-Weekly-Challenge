@@ -220,5 +220,27 @@ where rank_num = 1;
 | A           | sushi        |
 | B           | sushi        |
 
+**8. What is the total items and amount spent for each member before they became a member??**
 
+````sql
+SELECT
+    sa.customer_id,
+    COUNT(sa.product_id) as total_items,
+    SUM(me.price) as total_sales
+from DannysDiner..sales sa
+join DannysDiner..members mem
+    on mem.customer_id = sa.customer_id
+JOIN DannysDiner..menu me
+    on me.product_id = sa.product_id
+where sa.order_date < mem.join_date
+GROUP by sa.customer_id;
+````
+#### Steps:
+- Doing two **JOIN** clauses as information from all tables are required.
+- Using **GROUP BY** for aggregation
 
+#### Answer:
+| customer_id | total_items | total_sales |
+| ----------- | ---------- |----------  |
+| A           | 2 |  25       |
+| B           | 3 |  40       |
