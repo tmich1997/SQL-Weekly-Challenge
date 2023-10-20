@@ -138,8 +138,74 @@ SELECT
 from DannysDiner..sales sa
 JOIN DannysDiner..menu mem
     ON mem.product_id = sa.product_id
-GROUP by customer_id;
+GROUP by sa.customer_id;
 
 -- 10. In the first week after a customer joins the program (including their join date) they 
 -- earn 2x points on all items, not just sushi - 
 -- how many points do customer A and B have at the end of January?
+SELECT
+    sa.customer_id,
+    SUM(
+        mu.price * (case 
+                        when mu.product_name = 'sushi'
+                        then 20
+                        when sa.order_date between mem.join_date and DATEADD(DAY, 6, mem.join_date)
+                        then 20
+                        ELSE 10
+                    end)
+    ) as points
+from DannysDiner..sales sa
+join DannysDiner..menu mu
+    on mu.product_id = sa.product_id
+join DannysDiner..members mem
+    on sa.customer_id = mem.customer_id
+where sa.order_date < DATEFROMPARTS(2021, 2, 1)
+GROUP by sa.customer_id;
+
+-- BONUS QUESTION - Join all the things
+SELECT
+    s.customer_id,
+    s.order_date,
+    mu.product_name,
+    mu.price,
+    case
+        when s.order_date >= mem.join_date then 'Y'
+        when s.order_date < mem.join_date then 'N'
+        else 'N'
+    END as member
+from DannysDiner..sales s
+left JOIN DannysDiner..members mem
+    on mem.customer_id = s.customer_id
+join DannysDiner..menu mu
+    on mu.product_id = s.product_id
+ORDER BY s.customer_id, s.order_date;
+
+
+-- BONUS QUESTION - Rank all the things
+with customer_data as (
+SELECT
+    s.customer_id,
+    s.order_date,
+    mu.product_name,
+    mu.price,
+    case
+        when s.order_date >= mem.join_date then 'Y'
+        when s.order_date < mem.join_date then 'N'
+        else 'N'
+    END as member
+from DannysDiner..sales s
+left JOIN DannysDiner..members mem
+    on mem.customer_id = s.customer_id
+join DannysDiner..menu mu
+    on mu.product_id = s.product_id
+)
+SELECT 
+    *,
+    case 
+        when cd.member = 'N' then null
+        else RANK() OVER(
+            partition by cd.customer_id, cd.member
+            order BY cd.order_date
+        )
+    end as ranking
+from customer_data cd;
