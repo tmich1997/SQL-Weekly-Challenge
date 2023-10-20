@@ -311,7 +311,7 @@ GROUP by sa.customer_id;
 | A           | 1370 |
 | B           | 820 |
 
-**Bonus Question: Join all the Things**
+**Bonus Question 1: Join all the Things**
 
 ````sql
 SELECT
@@ -354,3 +354,58 @@ ORDER BY s.customer_id, s.order_date;
 | C           | 2021-01-01 | ramen        | 12    | N      |
 | C           | 2021-01-01 | ramen        | 12    | N      |
 | C           | 2021-01-07 | ramen        | 12    | N      |
+
+**Bonus Question 2: Rank all the Things**
+
+````sql
+with customer_data as (
+SELECT
+    s.customer_id,
+    s.order_date,
+    mu.product_name,
+    mu.price,
+    case
+        when s.order_date >= mem.join_date then 'Y'
+        when s.order_date < mem.join_date then 'N'
+        else 'N'
+    END as member
+from DannysDiner..sales s
+left JOIN DannysDiner..members mem
+    on mem.customer_id = s.customer_id
+join DannysDiner..menu mu
+    on mu.product_id = s.product_id
+)
+SELECT 
+    *,
+    case 
+        when cd.member = 'N' then null
+        else RANK() OVER(
+            partition by cd.customer_id, cd.member
+            order BY cd.order_date
+        )
+    end as ranking
+from customer_data cd;
+````
+#### Steps:
+- Using CTE `customer_data` to create an inner query.
+- Using the inner query to make a **CASE** statement for a new field **member**, this will check weather or they were a member in the loyalty program on the day they ordered food.
+- Using a window function **RANK()** to rank every row based on a **PARTITION** of `customer_id` then `member`.
+
+#### Answer:
+| customer_id | order_date | product_name | price | member | ranking | 
+| ----------- | ---------- | -------------| ----- | ------ |-------- |
+| A           | 2021-01-01 | sushi        | 10    | N      | NULL
+| A           | 2021-01-01 | curry        | 15    | N      | NULL
+| A           | 2021-01-07 | curry        | 15    | Y      | 1
+| A           | 2021-01-10 | ramen        | 12    | Y      | 2
+| A           | 2021-01-11 | ramen        | 12    | Y      | 3
+| A           | 2021-01-11 | ramen        | 12    | Y      | 3
+| B           | 2021-01-01 | curry        | 15    | N      | NULL
+| B           | 2021-01-02 | curry        | 15    | N      | NULL
+| B           | 2021-01-04 | sushi        | 10    | N      | NULL
+| B           | 2021-01-11 | sushi        | 10    | Y      | 1
+| B           | 2021-01-16 | ramen        | 12    | Y      | 2
+| B           | 2021-02-01 | ramen        | 12    | Y      | 3
+| C           | 2021-01-01 | ramen        | 12    | N      | NULL
+| C           | 2021-01-01 | ramen        | 12    | N      | NULL
+| C           | 2021-01-07 | ramen        | 12    | N      | NULL
