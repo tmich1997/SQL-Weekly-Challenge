@@ -33,4 +33,23 @@ group by s.customer_id;
 | B           | 74          |
 | C           | 36          |
 
-**2. What is the total amount each customer spent at the restaurant?**
+**2. How many days has each customer visited the restaurant?**
+
+````sql
+SELECT 
+    customer_id as customer,
+    count(distinct(order_date)) as visit_count
+from DannysDiner.dbo.sales
+group by customer_id;
+````
+
+#### Steps:
+- Using **COUNT DISTINCT** to get total number of visits.
+- Using **GROUP BY** for aggregation.
+
+#### Answer:
+| customer_id | visit_count |
+| ----------- | ----------- |
+| A           | 4          |
+| B           | 6          |
+| C           | 2          |
