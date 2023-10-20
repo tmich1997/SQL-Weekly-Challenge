@@ -151,6 +151,41 @@ WHERE rank = 1;
 | B           | ramen        |  2   |
 | C           | ramen        |  3   |
 
+**6. Which item was purchased first by the customer after they became a member?**
+
+````sql
+WITH joined_as_member as (
+    SELECT
+        sa.order_date,
+        sa.customer_id,
+        me.product_name,
+        ROW_NUMBER() OVER(
+            partition  by sa.customer_id
+            order by sa.order_date) as row_num
+    from DannysDiner.dbo.sales sa
+    join DannysDiner.dbo.menu me
+        on me.product_id = sa.product_id
+)
+SELECT
+    joined_as_member.customer_id,
+    joined_as_member.product_name
+from joined_as_member
+join DannysDiner.dbo.members mem
+    on mem.customer_id = joined_as_member.customer_id
+where joined_as_member.order_date > mem.join_date
+    and
+row_num = 4;
+````
+
+#### Steps:
+- Using CTE with an inner query - `joined_as_member` doing most of the heavy lifting.
+- Using a window function **ROW_NUMBER()** to apply a row_number to each row.
+
+#### Answer:
+| customer_id | product_name |
+| ----------- | ---------- |
+| A           | ramen        |
+| B           | sushi        |
 
 
 
