@@ -409,3 +409,5 @@ from customer_data cd;
 | C           | 2021-01-01 | ramen        | 12    | N      | NULL
 | C           | 2021-01-01 | ramen        | 12    | N      | NULL
 | C           | 2021-01-07 | ramen        | 12    | N      | NULL
+
+You can also download the SQL file - 'Week_1.sql' if you wish to as well.
