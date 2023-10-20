@@ -50,6 +50,43 @@ group by customer_id;
 #### Answer:
 | customer_id | visit_count |
 | ----------- | ----------- |
-| A           | 4          |
-| B           | 6          |
-| C           | 2          |
+| A           | 4           |
+| B           | 6           |
+| C           | 2           |
+
+**3. What was the first item from the menu purchased by each customer?**
+
+````sql
+WITH first_item as (
+    SELECT
+        sa.customer_id,
+        sa.product_id,
+        DENSE_RANK() OVER(
+            partition by sa.customer_id
+            order by sa.order_date
+        ) as rank
+    from DannysDiner.dbo.sales sa
+    group by sa.customer_id, sa.product_id, sa.order_date
+)
+SELECT
+    fi.customer_id,
+    me.product_name
+from DannysDiner.dbo.menu me
+join first_item fi on me.product_id = fi.product_id
+where rank = 1;
+````
+
+#### Steps:
+- Used CTE or Common Table expression which is essentially nested SQL queries. In this case the inner query is called `first_item` and once that is saved we can call it and query it
+- We are also using a window function **DENSE_RANK()** which means there wont be any gaps inserted, it will go 1,2,3,4,4,4,5,6 and so on.
+- Applying a filter with the **WHERE** clause.
+
+#### Answer:
+| customer_id | product_name | 
+| ----------- | ----------- |
+| A           | curry        | 
+| A           | sushi        | 
+| B           | curry        | 
+| C           | ramen        |
+
+
