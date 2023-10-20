@@ -13,6 +13,7 @@ Danny wants to use data answer some quesitons about his customers like: their sp
 ## Question and Solution
 
 **1. What is the total amount each customer spent at the restaurant?**
+
 ````sql
 select
     s.customer_id,
@@ -21,3 +22,15 @@ from DannysDiner.dbo.sales s
 join DannysDiner.dbo.menu m on s.product_id = m.product_id
 group by s.customer_id;
 ````
+#### Steps:
+- Using **JOIN** to get pricing data on a common field which would be the `product_id`.
+- Using **GROUP BY** to aggregate as I only want it for each customer.
+
+#### Answer:
+| customer_id | total_sales |
+| ----------- | ----------- |
+| A           | 76          |
+| B           | 74          |
+| C           | 36          |
+
+**2. What is the total amount each customer spent at the restaurant?**
