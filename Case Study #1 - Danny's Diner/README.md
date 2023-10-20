@@ -310,3 +310,47 @@ GROUP by sa.customer_id;
 | ----------- | ---------- |
 | A           | 1370 |
 | B           | 820 |
+
+**Bonus Question: Join all the Things**
+
+````sql
+SELECT
+    s.customer_id,
+    s.order_date,
+    mu.product_name,
+    mu.price,
+    case
+        when s.order_date >= mem.join_date then 'Y'
+        when s.order_date < mem.join_date then 'N'
+        else 'N'
+    END as member
+from DannysDiner..sales s
+left JOIN DannysDiner..members mem
+    on mem.customer_id = s.customer_id
+join DannysDiner..menu mu
+    on mu.product_id = s.product_id
+ORDER BY s.customer_id, s.order_date;
+````
+#### Steps:
+- Using a **CASE** statement to create another field called member.
+- Doing a **LEFT JOIN** on the **members** table to capture all the members and the matching rows in the right table as well (**sales**).
+- Using **ORDER BY** to order the table from ascending order of `customer_id` and `order date`.
+
+#### Answer:
+| customer_id | order_date | product_name | price | member |
+| ----------- | ---------- | -------------| ----- | ------ |
+| A           | 2021-01-01 | sushi        | 10    | N      |
+| A           | 2021-01-01 | curry        | 15    | N      |
+| A           | 2021-01-07 | curry        | 15    | Y      |
+| A           | 2021-01-10 | ramen        | 12    | Y      |
+| A           | 2021-01-11 | ramen        | 12    | Y      |
+| A           | 2021-01-11 | ramen        | 12    | Y      |
+| B           | 2021-01-01 | curry        | 15    | N      |
+| B           | 2021-01-02 | curry        | 15    | N      |
+| B           | 2021-01-04 | sushi        | 10    | N      |
+| B           | 2021-01-11 | sushi        | 10    | Y      |
+| B           | 2021-01-16 | ramen        | 12    | Y      |
+| B           | 2021-02-01 | ramen        | 12    | Y      |
+| C           | 2021-01-01 | ramen        | 12    | N      |
+| C           | 2021-01-01 | ramen        | 12    | N      |
+| C           | 2021-01-07 | ramen        | 12    | N      |
