@@ -113,7 +113,7 @@ order by count(sa.product_id) DESC;
 | ----------- | ----------- |
 | ramen          | 8        | 
 
-**5. Which item was the most popular for each customer??**
+**5. Which item was the most popular for each customer?**
 
 ````sql
 WITH most_popular as (
@@ -220,7 +220,7 @@ where rank_num = 1;
 | A           | sushi        |
 | B           | sushi        |
 
-**8. What is the total items and amount spent for each member before they became a member??**
+**8. What is the total items and amount spent for each member before they became a member?**
 
 ````sql
 SELECT
@@ -244,3 +244,35 @@ GROUP by sa.customer_id;
 | ----------- | ---------- |----------  |
 | A           | 2 |  25       |
 | B           | 3 |  40       |
+
+**9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
+
+````sql
+SELECT
+    sa.customer_id,
+    SUM(
+        case
+            when 
+                mem.product_name = 'sushi'
+            then
+                mem.price * 20
+            else
+                mem.price * 10
+        end
+    ) as total_points
+from DannysDiner..sales sa
+JOIN DannysDiner..menu mem
+    ON mem.product_id = sa.product_id
+GROUP by sa.customer_id;
+````
+#### Steps:
+- Using **SUM** for aggregating numeric values.
+- Using **CASE** statements, which behave like **IF/ELSE** statements.
+- Aggregating to the `customer_id` level.
+
+#### Answer:
+| customer_id | total_points | 
+| ----------- | ---------- |
+| A           | 860 |
+| B           | 940 |
+| C           | 360 |
