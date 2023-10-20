@@ -89,4 +89,32 @@ where rank = 1;
 | B           | curry        | 
 | C           | ramen        |
 
+**4. What is the most purchased item on the menu and how many times was it purchased by all customers?**
+
+````sql
+SELECT 
+    top 1 
+    me.product_name,
+    count(sa.product_id) as most_purchased 
+from DannysDiner.dbo.sales sa
+join DannysDiner.dbo.menu me
+    on sa.product_id = me.product_id
+group by me.product_name, sa.product_id
+order by count(sa.product_id) DESC;
+````
+
+#### Steps:
+- Used **TOP** as I should only have one item
+- Used **GROUP BY** for aggregation
+- Sorted the list first using **DESC** then chose the top 1
+
+#### Answer:
+| product_name | most_purchased | 
+| ----------- | ----------- |
+| ramen          | 8        | 
+
+
+
+
+
 
