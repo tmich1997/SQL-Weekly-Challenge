@@ -276,3 +276,37 @@ GROUP by sa.customer_id;
 | A           | 860 |
 | B           | 940 |
 | C           | 360 |
+
+**10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?**
+
+````sql
+SELECT
+    sa.customer_id,
+    SUM(
+        mu.price * (case 
+                        when mu.product_name = 'sushi'
+                        then 20
+                        when sa.order_date between mem.join_date and DATEADD(DAY, 6, mem.join_date)
+                        then 20
+                        ELSE 10
+                    end)
+    ) as points
+from DannysDiner..sales sa
+join DannysDiner..menu mu
+    on mu.product_id = sa.product_id
+join DannysDiner..members mem
+    on sa.customer_id = mem.customer_id
+where sa.order_date < DATEFROMPARTS(2021, 2, 1)
+GROUP by sa.customer_id;
+````
+#### Steps:
+- Using **SUM** and **CASE** statements to calculate the points.
+- Useing **DATEADD()** to see if they are eligible for the 20 points from within the week.
+- Aggregating to the `customer_id` level.
+- Using **DATEFROMPARTS()** to calculate the points for the month of January.
+
+#### Answer:
+| customer_id | points | 
+| ----------- | ---------- |
+| A           | 1370 |
+| B           | 820 |
