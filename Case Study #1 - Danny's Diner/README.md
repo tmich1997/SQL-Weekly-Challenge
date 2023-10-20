@@ -187,7 +187,38 @@ row_num = 4;
 | A           | ramen        |
 | B           | sushi        |
 
+**7. Which item was purchased just before the customer became a member?**
 
+````sql
+WITH item_purchase as (
+    SELECT
+        sa.product_id,
+        mem.customer_id,
+        ROW_NUMBER() OVER (
+            partition by mem.customer_id
+            order BY sa.order_date DESC) rank_num
+    from DannysDiner.dbo.sales sa
+    join DannysDiner.dbo.members mem
+        ON mem.customer_id = sa.customer_id
+        AND sa.order_date < mem.join_date
+)
+SELECT
+    item_purchase.customer_id,
+    me.product_name
+from item_purchase
+JOIN DannysDiner.dbo.menu me
+    on me.product_id = item_purchase.product_id
+where rank_num = 1;
+````
+#### Steps:
+- Using CTE with an inner query - `item_purchase` doing most of the heavy lifting.
+- Using a window function **ROW_NUMBER()** to apply a row_number to each row.
+
+#### Answer:
+| customer_id | product_name |
+| ----------- | ---------- |
+| A           | sushi        |
+| B           | sushi        |
 
 
 
