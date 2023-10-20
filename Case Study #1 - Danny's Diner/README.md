@@ -113,6 +113,44 @@ order by count(sa.product_id) DESC;
 | ----------- | ----------- |
 | ramen          | 8        | 
 
+**5. Which item was the most popular for each customer??**
+
+````sql
+WITH most_popular as (
+    SELECT
+        sa.customer_id as customer_id,
+        me.product_name,
+        count(sa.product_id) as order_count,
+        DENSE_RANK() OVER(
+            partition by sa.customer_id
+            order by count(sa.product_id) desc) as rank
+    from DannysDiner.dbo.sales sa
+    join DannysDiner.dbo.menu me
+        on me.product_id = sa.product_id
+    group by sa.customer_id, me.product_name
+)
+select
+    most_popular.customer_id, 
+    most_popular.product_name, 
+    most_popular.order_count
+FROM most_popular 
+WHERE rank = 1;
+````
+
+#### Steps:
+- Using CTE with an inner query - `most_popular` doing most of the heavy lifting.
+- Using a window function **DENSE_RANK** to apply a rank
+- **WHERE** clause to filter only items with **RANK** 1.
+
+#### Answer:
+| customer_id | product_name | order_count |
+| ----------- | ---------- |------------  |
+| A           | ramen        |  3   |
+| B           | sushi        |  2   |
+| B           | curry        |  2   |
+| B           | ramen        |  2   |
+| C           | ramen        |  3   |
+
 
 
 
