@@ -6,6 +6,9 @@ from DannysDiner.dbo.sales s
 join DannysDiner.dbo.menu m on s.product_id = m.product_id
 group by s.customer_id;
 
+select *
+FROM DannysDiner.dbo.menu;
+
 -- 2. How many days has each customer visited the restaurant?
 SELECT 
     customer_id as customer,
