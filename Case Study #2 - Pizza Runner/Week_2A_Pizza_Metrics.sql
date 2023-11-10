@@ -26,7 +26,7 @@ SELECT
     pn.pizza_name as Pizza_type,
     COUNT(*) as #_of_pizzas_deliveries
 FROM clean_runner_orders rc
-JOIN customer_orders co
+JOIN clean_customer_orders co
     ON rc.order_id = co.order_id
 JOIN pizza_names pn
     on co.pizza_id = pn.pizza_id
